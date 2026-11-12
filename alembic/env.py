@@ -4,11 +4,12 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 from dotenv import load_dotenv
 load_dotenv()
-from app.database import Base
+from app.database import Base, normalize_database_url
 from app import models  # noqa: F401 - register all mapped tables
 config = context.config
 if config.config_file_name: fileConfig(config.config_file_name)
 db_url=os.getenv('DATABASE_URL')
+if db_url: db_url=normalize_database_url(db_url)
 if db_url: config.set_main_option('sqlalchemy.url', db_url.replace('%','%%'))
 target_metadata=Base.metadata
 

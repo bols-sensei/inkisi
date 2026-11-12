@@ -31,7 +31,7 @@ def validate_production_config() -> None:
     if secret == jwt_secret:
         raise RuntimeError("SECRET_KEY et JWT_SECRET_KEY doivent être deux secrets différents.")
 
-    if not os.getenv("DATABASE_URL", "").startswith(("postgresql://", "postgresql+psycopg://")):
+    if not os.getenv("DATABASE_URL", "").startswith(("postgres://", "postgresql://", "postgresql+psycopg://")):
         raise RuntimeError("PostgreSQL est obligatoire en production.")
     if not os.getenv("RATE_LIMIT_REDIS_URL", "").strip():
         raise RuntimeError("Configurez RATE_LIMIT_REDIS_URL pour le rate limiting partagé.")

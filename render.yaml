@@ -1,0 +1,72 @@
+services:
+  - type: web
+    name: inkisi-web
+    runtime: python
+    region: frankfurt
+    plan: 0.5c-512mb
+    branch: production-ready
+    buildCommand: pip install -r requirements.txt
+    preDeployCommand: alembic upgrade head
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /
+    autoDeployTrigger: commit
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.11
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: inkisi-postgres
+          property: connectionString
+      - key: RATE_LIMIT_REDIS_URL
+        fromService:
+          type: keyvalue
+          name: inkisi-keyvalue
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: PUBLIC_BASE_URL
+        fromService:
+          type: web
+          name: inkisi-web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: ALLOWED_HOSTS
+        fromService:
+          type: web
+          name: inkisi-web
+          envVarKey: RENDER_EXTERNAL_HOSTNAME
+      - key: TRUSTED_PROXY_COUNT
+        value: "1"
+      - key: SESSION_MAX_AGE_SECONDS
+        value: "43200"
+      - key: ADMIN_USERNAME
+        value: platform-admin
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_SYNC_PASSWORD
+        value: "false"
+      - key: PUSH_OUTBOX_POLL_SECONDS
+        value: "2"
+      - key: TRIAL_EVENT_LIMIT
+        value: "2"
+      - key: SUBSCRIPTION_GRACE_DAYS
+        value: "7"
+
+  - type: keyvalue
+    name: inkisi-keyvalue
+    region: frankfurt
+    plan: 256mb
+    maxmemoryPolicy: noeviction
+    persistenceMode: journal-snapshot
+    ipAllowList: []
+
+databases:
+  - name: inkisi-postgres
+    region: frankfurt
+    plan: 0.1c-256mb
+    databaseName: inkisi
+    postgresMajorVersion: "17"
+    ipAllowList: []
