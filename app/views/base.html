@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Gérez vos événements, invitations et accueils depuis une seule application.">
+<meta name="theme-color" content="#0b5d4b">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Invitations">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="icon" href="/static/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/static/icons/icon-180.png">
+<link rel="preload" href="/static/fonts/display.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/body.woff2" as="font" type="font/woff2" crossorigin>
+<title>{% block title %}Invitations{% endblock %}</title>
+<script src="/static/js/theme-init.js"></script>
+<link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+{% block body %}
+<div id="app" class="shell"></div>
+<div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+<script type="application/json" id="boot">{"user":{{ user|tojson }},"eventId":{% block event_id %}null{% endblock %}}</script>
+<script src="/static/js/boot.js"></script>
+<script type="module" src="/static/js/main.js"></script>
+<noscript>Cette application nécessite JavaScript.</noscript>
+{% endblock %}
+</body>
+</html>

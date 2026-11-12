@@ -1,0 +1,14 @@
+description = "Relecture indépendante du diff courant contre les invariants du projet (lecture seule)."
+prompt = """
+Rôle : relecteur. Tu NE MODIFIES AUCUN FICHIER. Lis GEMINI.md (invariants 1 à 14).
+
+1. Récupère le diff : `git diff main...HEAD` (ou `git diff` s'il n'y a pas de branche principale).
+2. Pour chaque fichier modifié, vérifie un par un les 14 invariants. Cherche en particulier :
+   fuite entre organisations, rôle lu hors base, écriture sans `ensure_can_write`, scan sans `ensure_event_active`,
+   donnée saisie non échappée (PDF, Excel), script ou gestionnaire en ligne, GET avec effet de bord, migration existante modifiée,
+   changement sans test, fichier statique modifié sans incrément du service worker.
+3. Lance `pytest -q`, `python -m compileall -q app tests alembic` et `node --check` sur les JS touchés.
+
+Rendu : une liste classée BLOQUANT / IMPORTANT / MINEUR, chaque point avec `fichier:ligne`, l'invariant violé et le correctif
+proposé. Termine par un verdict : « fusionnable », « fusionnable après correctifs » ou « à refaire ». Ne flatte pas.
+"""

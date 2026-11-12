@@ -1,0 +1,22 @@
+description = "Lot 4 : interface (quota, révocation d'invitation, suspension d'organisation, accessibilité) avec Impeccable."
+prompt = """
+Rôle : designer-intégrateur. Lis GEMINI.md (invariants 6, 7, 11, 13 en priorité). PRODUCT.md et DESIGN.md doivent exister ; sinon lance
+d'abord `/design-init`. Utilise le skill `impeccable` (commandes `shape`, `craft`, `harden`, `polish`, `audit` selon l'étape).
+Périmètre demandé (laisser vide = tout le lot 4) : {{args}}
+
+Contraintes techniques : JS en modules ES natifs, aucune dépendance, aucun script ni gestionnaire en ligne (CSP), polices
+auto-hébergées, thème clair/sombre, mobile-first, utilisable d'une main et en plein soleil. Les appels API existent déjà.
+
+Chantiers :
+A. Écran « Mon abonnement » complet : quota restant AVANT de cliquer sur « créer un événement », état grâce/lecture seule expliqué.
+B. Invitations : boutons Révoquer / Réactiver / Régénérer le QR (API prête : `/admin/api/events/{id}/invitations/{id}/revoke|restore|regenerate-token`),
+   avec confirmation nommée de l'action destructive et rappel de réimprimer le QR.
+C. Console superadmin : suspendre/réactiver une organisation (`PATCH /superadmin/api/organizations/{id}/status`), journal filtré par organisation.
+D. Accessibilité : `aria-live` pour toasts et listes dynamiques, piège de focus des feuilles modales, cibles tactiles ≥ 44 px,
+   contrastes (clair et sombre), `prefers-reduced-motion`, retour visuel du scan lisible à distance.
+E. Incrémenter la version du service worker et ajouter les nouveaux fichiers au shell.
+
+Pour chaque écran : `/impeccable shape` (brief court) → implémentation → `/impeccable harden` puis `/impeccable polish`.
+Vérifie par captures bureau ET mobile en un seul lot, puis corrige une fois (ne boucle pas). Ajoute les tests d'API manquants.
+Rendu : écrans modifiés, captures, sorties de `node --check` et `pytest -q`, points d'accessibilité encore ouverts.
+"""

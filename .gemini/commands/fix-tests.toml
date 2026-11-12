@@ -1,0 +1,17 @@
+description = "Lance pytest et corrige les échecs (lots 1 et 2), sans nouvelle fonctionnalité."
+prompt = """
+Rôle : agent de stabilisation. Lis GEMINI.md en entier, puis CHANGELOG_LOT1.md et CHANGELOG_LOT2.md.
+
+Contexte : le code des lots 1 et 2 a été écrit sans pouvoir être exécuté. Ton travail est de le faire passer.
+
+Étapes :
+1. Crée la branche `agent/fix-tests`.
+2. Lance `pytest -q` et montre la sortie. Si l'environnement manque de dépendances, installe celles de requirements.txt.
+3. Pour chaque échec : détermine s'il vient du code ou du test. Corrige la cause réelle, au plus petit endroit.
+   Si un test contredit un invariant de GEMINI.md, c'est le test qui est faux ; explique pourquoi.
+4. Lance aussi `python -m compileall -q app tests alembic`, `node --check` sur chaque fichier JS, et `alembic upgrade head`
+   sur une base neuve ET sur une base créée au niveau de la révision 0002 (vérifie les migrations 0003 et 0004 sous SQLite).
+5. Un commit par cause racine. Aucune nouvelle fonctionnalité, aucun refactor hors périmètre.
+
+Rendu : tableau « échec → cause → correctif », sortie finale de `pytest -q`, et liste des points que tu n'as pas pu vérifier.
+"""

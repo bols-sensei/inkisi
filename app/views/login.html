@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Connexion — Invitations{% endblock %}
+{% block body %}
+<main class="login">
+  <section class="login-art">
+    <div class="mark" aria-hidden="true"><svg class="ic lg" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v6h-4M14 18v2"/></svg></div>
+    <h1>Chaque invité, un accès contrôlé.</h1>
+    <p>Scannez, vérifiez et suivez les entrées en direct, même quand le réseau lâche.</p>
+  </section>
+  <section class="login-form">
+  <form action="/login" method="post" autocomplete="on">
+    <div><h2>Connexion</h2><p class="muted small" style="margin-top:4px">Utilisez le compte fourni par l’administrateur.</p></div>
+    {% if error %}<div class="banner bad" role="alert">{{ error }}</div>{% endif %}
+    <label class="field">Identifiant
+      <input class="input" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required autofocus>
+    </label>
+    <label class="field">Mot de passe
+      <input class="input" type="password" name="password" autocomplete="current-password" required>
+    </label>
+    <button class="btn primary block" type="submit">Se connecter</button>
+    <p class="faint tiny"><a href="/forgot-password">Mot de passe oublié ?</a></p>
+    <p class="faint tiny">Accès réservé au personnel autorisé.</p>
+  </form>
+    <details class="register-box">
+      <summary>Créer une organisation</summary>
+      <form id="registerForm" class="col" style="margin-top:14px" autocomplete="off">
+        <label class="field">Nom de l’organisation<input class="input" name="name" required maxlength="180"></label>
+        <label class="field">Nom complet de l’administrateur<input class="input" name="admin_full_name" required maxlength="160"></label>
+        <label class="field">Adresse e-mail<input class="input" type="email" name="admin_email" required maxlength="254" autocomplete="email"></label>
+        <label class="field">Identifiant<input class="input" name="admin_username" required minlength="3" maxlength="80" autocapitalize="none"></label>
+        <label class="field">Mot de passe<input class="input" type="password" name="admin_password" required minlength="10" autocomplete="new-password"></label>
+        <div id="registerMessage" aria-live="polite"></div>
+        <button class="btn tonal block" type="submit">Démarrer mon essai gratuit de 14 jours</button>
+      </form>
+    </details>
+  </section>
+</main>
+<script type="module" src="/static/js/auth.js"></script>
+<script src="/static/js/sw-register.js"></script>
+{% endblock %}

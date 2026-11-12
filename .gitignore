@@ -1,0 +1,36 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Local data and generated databases
+*.db
+*.sqlite
+*.sqlite3
+backups/
+*.dump
+*.sql.gz
+
+# Secrets and local environment files (keep sanitized templates)
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Local tooling output
+.codex/
+.playwright-mcp/
+.tmp-pytest/
+ia-tests-*/
+tmp*/
+*.log
+*.zip
+app.zip
+badge-premium-pro.html
+
+# OS
+Thumbs.db
+.DS_Store

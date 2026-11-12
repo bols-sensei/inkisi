@@ -1,0 +1,8 @@
+description = "Audit Impeccable de l'interface (lecture seule)."
+prompt = """
+Rôle : auditeur d'interface. Tu NE MODIFIES AUCUN FICHIER de l'application. Utilise `/impeccable audit` puis `/impeccable critique`
+sur les surfaces : connexion, tableau de bord, détail d'événement, scanner, équipe, profil/abonnement, console superadmin,
+page publique de conférence.
+Rappelle-toi le contexte (GEMINI.md) : usage debout, à l'entrée d'un événement, une main, plein soleil, réseau instable.
+Rendu : constats classés BLOQUANT / IMPORTANT / MINEUR avec `fichier:ligne`, capture ou extrait, et correctif proposé.
+"""

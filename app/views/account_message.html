@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — Invitations{% endblock %}
+{% block body %}
+<main class="login">
+  <section class="login-form" style="margin:auto">
+    <div class="col" style="max-width:420px;margin:auto">
+      <h1 style="font-size:1.4rem">{{ title }}</h1>
+      {% if message %}<div class="banner {{ kind }}" role="{{ 'alert' if kind == 'bad' else 'status' }}">{{ message }}</div>{% endif %}
+      {% if form %}
+      <form action="{{ form.action }}" method="post" class="col" autocomplete="off">
+        {% for f in form.fields %}
+        <label class="field">{{ f.label }}
+          <input class="input" type="{{ f.type }}" name="{{ f.name }}" autocomplete="{{ f.autocomplete }}" {% if f.minlength %}minlength="{{ f.minlength }}"{% endif %} required>
+        </label>
+        {% endfor %}
+        <button class="btn primary block" type="submit">{{ form.button }}</button>
+      </form>
+      {% endif %}
+      {% if link %}<a class="btn ghost block" href="{{ link[0] }}">{{ link[1] }}</a>{% endif %}
+    </div>
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<main class="pub">
+  <header class="pub-hero">
+    <div class="mark" aria-hidden="true">
+      <svg class="ic lg" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v6h-4M14 18v2"/></svg>
+    </div>
+    <h1>{{ title }}</h1>
+    {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
+    {% if mode == 'register' %}
+      <span class="live"><i></i><span>Inscriptions ouvertes</span></span>
+    {% endif %}
+  </header>
+
+  <section class="pub-body">
+  {% if mode == 'register' %}
+    <!-- Formulaire simplifié et sécurisé d'inscription -->
+    <form id="f" class="card col" autocomplete="on">
+      <div>
+        <h2>Inscription officielle</h2>
+        <p class="muted small">Remplissez vos coordonnées. Une inscription sans photo sera transmise à l’organisateur pour validation.</p>
+      </div>
+
+      <!-- Photo pour le badge (facultatif) -->
+      <div class="photo-picker-wrap">
+        <div class="photo-avatar" id="avatarPreview" tabindex="0" role="button" aria-label="Choisir une photo pour votre badge">
+          <svg class="ic lg camera-ico" id="cameraIcon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <img id="avatarImg" class="photo-preview-img hidden" alt="Aperçu photo badge">
+        </div>
+        <input type="file" id="photoInput" accept="image/*" capture="user" class="hidden">
+        <input type="hidden" name="photo_data" id="photoData">
+        <div class="photo-actions">
+          <button type="button" class="btn sm tonal" id="choosePhotoBtn">Ajouter une photo</button>
+          <button type="button" class="btn sm ghost hidden" id="removePhotoBtn">Supprimer</button>
+        </div>
+        <p class="muted tiny">Facultatif. Votre photo sera intégrée à votre badge individuel.</p>
+      </div>
+
+      <div class="row wrap" style="gap:12px">
+        <label class="field grow" style="min-width:220px">
+          Nom *
+          <input class="input" name="last_name" required minlength="2" placeholder="Ex : DUPONT" autocomplete="family-name">
+        </label>
+        <label class="field grow" style="min-width:220px">
+          Prénom *
+          <input class="input" name="first_name" required minlength="2" placeholder="Ex : Sarah" autocomplete="given-name">
+        </label>
+      </div>
+
+      <label class="field">
+        Adresse e-mail *
+        <input class="input" name="email" type="email" required placeholder="nom@exemple.com" autocomplete="email" inputmode="email">
+        <small class="muted">Adresse de contact uniquement : aucun e-mail de confirmation n’est envoyé. Une seule inscription est autorisée par adresse.</small>
+      </label>
+
+      <label class="field">
+        Numéro de téléphone *
+        <input class="input" name="phone" type="tel" required minlength="4" placeholder="Ex : +33 6 12 34 56 78" autocomplete="tel">
+      </label>
+
+      <label class="field">
+        Profession <small>facultatif</small>
+        <input class="input" name="profession" placeholder="Ex : Directeur Technique, Chercheur, Consultant..." autocomplete="organization-title">
+      </label>
+
+      <label class="field">
+        Société / Organisation <small>facultatif</small>
+        <input class="input" name="organization_name" placeholder="Ex : Université, Société, Institution..." autocomplete="organization">
+      </label>
+
+      <div id="msg" role="status" aria-live="polite"></div>
+      <button class="btn primary block" type="submit" id="submitBtn">Valider et obtenir mon badge (PNG)</button>
+    </form>
+
+    <div id="registrationResult" class="card col hidden" role="status" aria-live="polite">
+      <div class="banner ok" id="registrationMessage"></div>
+      <a id="registrationManageLink" class="btn primary block hidden" href="#" rel="noreferrer">Ouvrir le suivi de mon inscription</a>
+      <p id="registrationSaveNote" class="small muted">Conservez ce lien maintenant : il ne sera pas envoyé par e-mail.</p>
+      <button type="button" class="btn tonal block" id="newRequestBtn">Enregistrer une autre personne</button>
+    </div>
+
+    <!-- Zone de résultat : badge généré immédiatement -->
+    <div id="badgeResult" class="col hidden">
+      <div class="banner ok" id="badgeBanner">Inscription validée ! Votre badge officiel d'accès a été généré avec succès.</div>
+
+      <div class="badge-card badge-premium">
+        <div class="badge-head">
+          <span class="badge-eyebrow">BADGE OFFICIEL</span>
+          <h3 id="resEventName">{{ title }}</h3>
+          <div class="badge-meta" id="resEventMeta">{{ subtitle }}</div>
+        </div>
+        <div class="badge-body">
+          <span class="badge-premium-category" id="resCategory">PARTICIPANT</span>
+          <div class="badge-photo-wrap" id="resPhotoWrap">
+            <svg class="ic lg" id="resPhotoPlaceholder" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <img id="resPhotoImg" class="hidden" alt="Photo participant">
+          </div>
+          <div class="badge-name" id="resFullName"></div>
+          <div class="badge-prof" id="resProf" style="font-weight:600;color:var(--color-primary);font-size:0.9rem"></div>
+          <div class="badge-org" id="resOrg"></div>
+          <div class="badge-qr-box">
+            <img id="resQrImg" alt="QR code d'accès">
+          </div>
+          <div class="badge-foot" id="resFoot">BADGE OFFICIEL · ACCÈS CONFÉRENCE</div>
+        </div>
+      </div>
+
+      <a id="resDownloadBtn" class="btn primary block" href="#" download="badge.png">
+        <svg class="ic sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Télécharger mon badge officiel (PNG)
+      </a>
+
+      <p class="small muted" style="text-align:center">Téléchargez votre badge en haute résolution au format PNG. Vous pouvez l'imprimer ou le présenter sur votre smartphone à l’accueil.</p>
+
+      <button type="button" class="btn tonal block" id="newRegBtn">Enregistrer une autre personne</button>
+    </div>
+
+    {% if program %}
+    <section class="card col" id="programSection">
+      <h2>Programme de la conférence</h2>
+      <div class="list">
+        {% for x in program %}
+        <div class="item">
+          <div class="avatar" style="font-size:.78rem">{{ x.starts_at.strftime('%H:%M') }}</div>
+          <div class="grow">
+            <div class="title">{{ x.title }}</div>
+            <div class="meta">
+              <span>{{ x.starts_at.strftime('%d/%m') }} – {{ x.ends_at.strftime('%H:%M') }}</span>
+              {% if x.location %}<span>{{ x.location }}</span>{% endif %}
+              {% if x.speaker %}<span>{{ x.speaker }}</span>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+  {% elif mode == 'manage' %}
+    <!-- Affichage et modification autonome de l'inscription et du badge -->
+    <div class="col" style="gap:20px">
+      <div class="badge-card badge-premium">
+        <div class="badge-head">
+          <span class="badge-eyebrow">BADGE OFFICIEL</span>
+          <h3>{{ event.name if event else 'Conférence' }}</h3>
+          <div class="badge-meta">{{ event.event_date if event else '' }}{% if event and event.venue %} · {{ event.venue }}{% endif %}</div>
+        </div>
+        <div class="badge-body">
+          <span class="badge-premium-category">{{ (reg.category or 'participant')|upper }}</span>
+          <div class="badge-photo-wrap">
+            {% if reg.photo_data %}
+              <img src="{{ reg.photo_data }}" alt="Photo {{ reg.full_name }}">
+            {% else %}
+              <svg class="ic lg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            {% endif %}
+          </div>
+          <div class="badge-name">{{ reg.full_name }}</div>
+          {% if reg.profession %}<div style="font-weight:600;color:var(--color-primary);font-size:0.9rem">{{ reg.profession }}</div>{% endif %}
+          {% if reg.organization_name %}<div class="badge-org">{{ reg.organization_name }}</div>{% endif %}
+          <div class="badge-qr-box">
+            <img src="/api/public/conferences/badge-qr/{{ reg.public_token }}.png" alt="QR Code d'accès">
+          </div>
+          <div class="badge-foot">BADGE OFFICIEL · RÉF #{{ "%05d"|format(reg.id) }}</div>
+        </div>
+      </div>
+
+      {% if reg.status == 'accepted' %}
+        <a class="btn primary block" href="/api/public/conferences/badge/{{ reg.public_token }}" download="badge_{{ reg.id }}.png">
+          <svg class="ic sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Télécharger mon badge officiel (PNG)
+        </a>
+      {% elif reg.status == 'waitlist' %}
+        <div class="banner info">Votre inscription est enregistrée sur liste d’attente.</div>
+      {% elif reg.status == 'rejected' %}
+        <div class="banner bad">Votre demande n’a pas été retenue.</div>
+      {% else %}
+        <div class="banner warn">Votre inscription est en cours de traitement.</div>
+      {% endif %}
+
+      <!-- Formulaire de modification des informations personnelles autorisées -->
+      <form id="manageForm" class="card col" style="margin-top:10px">
+        <div>
+          <h3>Modifier mes informations</h3>
+          <p class="muted small">Vous pouvez corriger vos coordonnées personnelles sans créer de nouvelle inscription.</p>
+        </div>
+
+        <div class="row wrap" style="gap:12px">
+          <label class="field grow" style="min-width:200px">
+            Nom
+            <input class="input" name="last_name" value="{{ reg.last_name or '' }}" placeholder="Votre nom">
+          </label>
+          <label class="field grow" style="min-width:200px">
+            Prénom
+            <input class="input" name="first_name" value="{{ reg.first_name or '' }}" placeholder="Votre prénom">
+          </label>
+        </div>
+
+        <label class="field">
+          Téléphone
+          <input class="input" name="phone" type="tel" value="{{ reg.phone or '' }}" placeholder="Numéro de téléphone">
+        </label>
+
+        <label class="field">
+          Profession <small>facultatif</small>
+          <input class="input" name="profession" value="{{ reg.profession or '' }}" placeholder="Votre profession">
+        </label>
+
+        <label class="field">
+          Société / Organisation <small>facultatif</small>
+          <input class="input" name="organization_name" value="{{ reg.organization_name or '' }}" placeholder="Votre organisation">
+        </label>
+
+        <div id="manageMsg" role="status" aria-live="polite"></div>
+        <button class="btn tonal block" type="submit" id="manageSubmitBtn">Enregistrer les modifications</button>
+      </form>
+    </div>
+
+  {% else %}
+    <section class="card col" style="text-align:center">
+      <h2>Inscriptions fermées</h2>
+      <p class="muted">Les inscriptions à cette conférence ne sont pas ouvertes pour le moment. Contactez l’organisateur.</p>
+    </section>
+  {% endif %}
+  </section>
+</main>
+<div id="toasts" class="toasts" role="status"></div>
+<script type="application/json" id="confdata">{"mode":{{ mode|tojson }},"token":{{ (token|default(''))|tojson }},"regToken":{{ (reg.public_token if reg else '')|tojson }}}</script>
+<script src="/static/js/conference_public.js"></script>
+{% endblock %}

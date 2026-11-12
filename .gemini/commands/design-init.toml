@@ -1,0 +1,12 @@
+description = "Initialise le contexte de design Impeccable (PRODUCT.md, DESIGN.md) pour ce projet."
+prompt = """
+Rôle : designer-intégrateur. Vérifie d'abord que le skill `impeccable` est disponible (`/skills list`) ; sinon arrête-toi et dis
+comment l'installer (README_AGENTS.md).
+
+1. Lis la section « Contexte produit pour Impeccable » de GEMINI.md : ce sont les réponses du propriétaire du produit.
+2. Exécute `/impeccable init` en utilisant ces réponses ; ne pose que les questions dont la réponse n'y figure pas.
+3. Exécute ensuite `/impeccable document` pour capturer le système de design EXISTANT (jetons, typographie, composants) depuis
+   `app/static/css/app.css` et les vues, sans rien redessiner.
+4. Exécute `/impeccable doctor` et corrige les écarts signalés.
+Ne modifie aucun fichier de l'application. Rendu : fichiers créés et décisions de design consignées.
+"""

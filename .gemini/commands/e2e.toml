@@ -1,0 +1,32 @@
+description = "Essais réels dans Chrome (MCP) : parcours utilisateurs, console CSP, hors ligne. Ne modifie pas le code."
+prompt = """
+Rôle : testeur de bout en bout. Tu NE MODIFIES AUCUN FICHIER ; tu signales. Lis GEMINI.md, section « Essais dans le navigateur ».
+Répartition des outils (vérifie `/mcp` ; si un serveur manque, travaille avec les autres et signale ce que tu n'as pas pu couvrir) :
+- `playwright-admin` : parcours scénarisés (formulaires, navigation, clics, vérification du texte affiché). Session de l'administrateur.
+- `playwright-agent` : SECONDE session indépendante (agent de terrain) pour tester la coupure immédiate d'une session, le changement de compte et l'isolation. Deux serveurs distincts car les onglets d'un même serveur partagent leurs cookies.
+- `chrome-devtools` : diagnostic. Console (violations CSP), requêtes réseau (codes, en-têtes `Content-Security-Policy`), émulation réseau hors ligne, IndexedDB/service worker, performance et captures mobile.
+Règle : on déroule le parcours avec Playwright, et à chaque page on contrôle la console et le réseau avec chrome-devtools.
+Périmètre demandé (laisser vide = tous les parcours) : {{args}}
+
+Préparation (base jetable, jamais de données réelles) :
+  export ENVIRONMENT=development DATABASE_URL=sqlite:///./e2e.db RATE_LIMIT_DISABLED=true \
+         ADMIN_USERNAME=root ADMIN_PASSWORD=RootPassword-123 SECRET_KEY=e2e-secret PUBLIC_BASE_URL=http://localhost:8000
+  rm -f e2e.db && alembic upgrade head && uvicorn app.main:app --port 8000   (en arrière-plan)
+Ouvre http://localhost:8000 avec une fenêtre isolée ; format mobile 390×844 puis bureau 1280×800.
+
+Pour CHAQUE page visitée : lis la console et le réseau. Toute violation « Content Security Policy », toute erreur JS, tout 4xx/5xx
+inattendu est un constat, même si l'écran semble correct.
+
+Parcours :
+1. Inscription d'une organisation (lien de confirmation affiché en développement) → connexion → créer un événement AVANT puis APRÈS confirmation de l'e-mail.
+2. Équipe : créer un agent, ouvrir une 2e fenêtre isolée connectée en agent, désactiver l'agent depuis l'admin, recharger la 2e fenêtre : la session doit être coupée sans boucle de redirection.
+3. Événement : importer 3 invités (CSV), tenter un scan sur un événement « Brouillon » (doit être refusé, message clair), passer l'événement « En cours », recherche manuelle puis passage, quota dépassé.
+4. Invitations : révoquer, tenter un passage (refus), réactiver, régénérer le QR (l'ancien refusé). Télécharger le PDF et le pack designer ; vérifier qu'un nom contenant `<b>` et `=1+1` ne casse rien.
+5. Hors ligne : événement en cours, coupe le réseau (émulation hors ligne), enregistre 2 passages, rétablis le réseau, vérifie la synchronisation et que l'heure du passage est celle du scan, pas celle de la synchro. Se déconnecter puis se reconnecter avec un autre compte : la file de l'autre compte ne doit pas être synchronisée.
+6. Conférence : créer une conférence, ouvrir la page publique (fenêtre isolée), s'inscrire deux fois avec la même adresse (réponses identiques), ouvrir le lien de confirmation (page de confirmation, rien consommé avant le clic), confirmer.
+7. Superadmin : suspendre l'organisation → l'admin est bloqué immédiatement ; réactiver. Journal d'activité visible côté admin.
+8. Abonnement : depuis la console, mettre fin à l'abonnement ; vérifier états « grâce » puis « lecture seule » dans « Mon abonnement ».
+
+Rendu : tableau parcours → résultat (OK / ÉCHEC), pour chaque échec : étapes, résultat attendu, résultat observé, message de console ou
+requête réseau, capture. Termine par la liste des écrans illisibles sur mobile ou en plein soleil (contraste, taille des cibles).
+"""

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Badge membre — {{ event.name }}{% endblock %}
+{% block body %}
+<main class="pub member-badge-page">
+  <header class="pub-hero"><div class="mark" aria-hidden="true">✦</div><h1>{{ event.name }}</h1><p>Badge membre · {{ event.event_date }}{% if event.venue %} · {{ event.venue }}{% endif %}</p></header>
+  <section class="pub-body">
+    {% if badge %}
+      <div class="card col member-badge-ready">
+        <div class="banner ok">Votre badge {{ badge.category }} est prêt.</div>
+        <p class="muted">Présentez ce badge à l’accueil. Sa couleur indique votre catégorie ; le QR n’est pas utilisé pour le contrôle.</p>
+        <img class="member-badge-preview" src="/api/public/member-badge/{{ badge.public_token }}.png" alt="Aperçu du badge membre de {{ badge.full_name }}">
+        <a class="btn primary block" href="/api/public/member-badge/{{ badge.public_token }}.png" download="badge-membre.png">Télécharger mon badge PNG</a>
+        <a class="btn ghost block" href="/member-badge/{{ event.member_badge_token }}">Retour au formulaire</a>
+      </div>
+    {% else %}
+      <form class="card col member-badge-form" method="post" action="/member-badge/{{ event.member_badge_token }}">
+        <div><h2>Obtenir un badge membre</h2><p class="muted small">Remplissez vos informations et ajoutez une photo pour personnaliser votre badge. Votre demande reste séparée des inscriptions des participants.</p></div>
+        <label class="field">Nom complet<input class="input" name="full_name" required maxlength="180" autocomplete="name"></label>
+        <label class="field">Adresse e-mail<input class="input" name="email" type="email" required maxlength="254" autocomplete="email"></label>
+        <label class="field">Organisation<input class="input" name="organization_name" maxlength="180" autocomplete="organization"></label>
+        <label class="field">Catégorie<select class="select" name="category" required>{% for category in categories %}<option value="{{ category }}">{{ category }}</option>{% endfor %}</select></label>
+        <label class="field">Photo personnelle<input class="input" id="memberPhoto" name="photo_file" type="file" accept="image/jpeg,image/png,image/webp" required aria-describedby="memberPhotoHelp"></label>
+        <span class="small muted" id="memberPhotoHelp">JPEG, PNG ou WebP. La photo est recadrée et optimisée avant d’être ajoutée au badge.</span>
+        <img class="member-photo-preview hidden" id="memberPhotoPreview" alt="Aperçu de votre photo">
+        <input type="hidden" name="photo_data" id="memberPhotoData" required>
+        <div class="banner bad hidden" id="memberPhotoError" role="alert"></div>
+        <button class="btn primary block" type="submit">Créer mon badge</button>
+      </form>
+    {% endif %}
+  </section>
+</main>
+{% if not badge %}<script src="/static/js/member_badge.js" defer></script>{% endif %}
+{% endblock %}

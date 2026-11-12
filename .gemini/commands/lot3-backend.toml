@@ -1,0 +1,16 @@
+description = "Lot 3 : fiabilité d'exploitation (migration figée, pagination, N+1, e-mails, données personnelles)."
+prompt = """
+Rôle : ingénieur backend. Lis GEMINI.md, AUDIT_SAAS.md (sections 3, 4 et 5) et CHANGELOG_LOT2.md.
+Périmètre demandé (laisser vide = tout le lot 3, dans cet ordre) : {{args}}
+
+Chantiers, un commit par sous-étape, un test par comportement :
+A. Migration 0001 figée : remplacer `create_all` par un DDL explicite du schéma tel qu'il était à la phase 2, en gardant
+   0002 à 0004 idempotentes. Prouver : base neuve → head ET base 0002 → head donnent le même schéma.
+B. Pagination (`limit` + curseur) pour invitations, inscriptions et notifications ; rétrocompatible côté JS (adapter `core.js`/`event.js`).
+C. N+1 : `event_detail`, `lookup`, `overview` (agrégats SQL ou jointures groupées). Ajoute un test qui compte les requêtes.
+D. File d'envoi : table `outbox` + traitement hors requête HTTP pour e-mails et notifications ; reprise sur échec, plafond de tentatives.
+E. Unicité `(organisation, identifiant)` avec choix de l'organisation à la connexion (impact : login, jeton, formulaires).
+F. Export des données d'une organisation (ZIP) et suppression/anonymisation d'un participant sur demande.
+
+Respecte tous les invariants. Mets à jour CHANGELOG_LOT3.md. Rendu : résumé par chantier, sorties de tests, risques restants.
+"""

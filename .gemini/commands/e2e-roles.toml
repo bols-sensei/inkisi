@@ -1,0 +1,30 @@
+description = "Essais navigateur par type de compte : superadmin, admin, superviseur, agent, participant public, admin d'une autre organisation."
+prompt = """
+Rôle : testeur de bout en bout, un type de compte à la fois. Tu NE MODIFIES AUCUN FICHIER. Lis GEMINI.md (section « Essais dans le navigateur »)
+et `tests/test_roles_matrix.py` : la matrice des droits côté API fait foi ; tu vérifies que l'INTERFACE lui est fidèle.
+Périmètre demandé (laisser vide = tous les comptes) : {{args}}
+Outils : `playwright-admin` et `playwright-agent` pour deux sessions simultanées, `chrome-devtools` pour console et réseau.
+Même préparation que `/e2e` (base jetable, ENVIRONMENT=development, RATE_LIMIT_DISABLED=true). Crée les données via l'interface ou l'API :
+une organisation A (admin vérifié), un superviseur et un agent affectés à un événement « En cours », un événement non affecté, une conférence ouverte,
+une organisation B avec son administrateur. Mobile 390×844, puis bureau pour l'administrateur et le superadmin.
+
+Pour CHAQUE compte, contrôle trois choses :
+(a) ce qui est VISIBLE (onglets, boutons, actions) ; (b) ce qui est INTERDIT par l'URL ou l'API même si le bouton est caché
+(ouvre l'adresse à la main ; attendu : refus clair, pas de page vide, pas de boucle de redirection) ; (c) console et réseau sans erreur ni violation CSP.
+
+1. SUPERADMIN : onglet Organisations ; créer une organisation ; suspendre puis réactiver (l'admin de cette organisation est coupé immédiatement) ;
+   changer l'abonnement ; lire le journal. Compte hors de toute organisation : aucune action « créer un événement » ne doit échouer en silence.
+2. ADMIN (organisation A) : tableau de bord et quota ; créer événement (bloqué tant que l'e-mail n'est pas confirmé) ; importer ; invitations
+   (créer, révoquer, réactiver, régénérer le QR) ; équipe (créer, changer le rôle, désactiver, réinitialiser un mot de passe, ne pas pouvoir se désactiver soi-même
+   ni retirer le dernier administrateur) ; abonnement ; journal ; changement de mot de passe (l'autre session est coupée).
+3. SUPERVISEUR : voit uniquement les événements affectés ; tableau de bord, agents, activité, exceptions ; crée une tâche ; enregistre une exception ;
+   n'a accès NI à l'équipe, NI à l'abonnement, NI à la création d'événement, NI aux imports.
+4. AGENT : voit uniquement ses événements ; recherche manuelle et passage ; hors ligne (2 passages), reconnexion et synchronisation ;
+   ne voit pas les tâches des autres en modification ; refusé partout ailleurs. Désactive-le depuis la session admin : sa session meurt au prochain appel.
+5. PARTICIPANT PUBLIC (aucun compte) : page de conférence, inscription, double inscription (réponses identiques), lien de confirmation (page puis clic),
+   page de suivi, badge. Aucune page d'administration accessible.
+6. ADMIN D'UNE AUTRE ORGANISATION (B) : ouvre à la main les adresses d'événements de A ; attendu : « introuvable », jamais « interdit », aucun nom d'événement ni d'invité visible.
+
+Rendu : un tableau par compte (visible / interdit / console), écarts avec la matrice des droits, captures, et la liste des boutons visibles
+mais refusés (ou cachés mais accessibles par URL), classés BLOQUANT / IMPORTANT / MINEUR.
+"""
