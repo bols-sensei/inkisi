@@ -18,7 +18,7 @@ Le Blueprint réutilise automatiquement l’URL publique et le nom d’hôte Ren
 - Dans **Events**, vérifie que le déploiement est `Live` et que le contrôle de santé `/` réussit.
 - Dans **Environment**, vérifie que `ENVIRONMENT=production`, que les secrets ont été générés et que le `DATABASE_URL` et `RATE_LIMIT_REDIS_URL` sont liés aux services du Blueprint. Ne copie jamais les chaînes de connexion dans un dépôt ou un message.
 - Configure la sauvegarde PostgreSQL et vérifie la procédure de restauration avant les données réelles.
-- Les notifications push sont facultatives et resteront désactivées tant que `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` et `VAPID_SUBJECT` ne sont pas renseignés dans l’environnement du service Web.
+- Le fichier local ignoré `.env.render` contient une paire VAPID générée pour ce déploiement. Remplace d’abord son mot de passe provisoire, puis utilise **Environment → Add from .env** sur le service Web pour importer le fichier. `VAPID_SUBJECT` est repris automatiquement de l’URL Render. Conserve une copie privée des clés ; ne les régénère pas après que les navigateurs se sont abonnés.
 - Si tu ajoutes un domaine personnalisé, règle `PUBLIC_BASE_URL` sur son URL HTTPS et ajoute son nom exact à `ALLOWED_HOSTS`, puis redéploie.
 - Un commit poussé sur `production-ready` déclenche un nouveau déploiement. Les migrations s’exécutent avant la mise en service.
 

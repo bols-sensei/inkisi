@@ -38,6 +38,16 @@ services:
           type: web
           name: inkisi-web
           envVarKey: RENDER_EXTERNAL_HOSTNAME
+      - key: VAPID_SUBJECT
+        fromService:
+          type: web
+          name: inkisi-web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: VAPID_SUBJECT
+        fromService:
+          type: web
+          name: inkisi-web
+          envVarKey: RENDER_EXTERNAL_URL
       - key: TRUSTED_PROXY_COUNT
         value: "1"
       - key: SESSION_MAX_AGE_SECONDS
